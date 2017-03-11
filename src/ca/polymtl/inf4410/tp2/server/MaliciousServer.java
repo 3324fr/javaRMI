@@ -39,7 +39,7 @@ public class MaliciousServer extends AbstractServer {
 		if(trueResult.nextInt(MAX_PERCENT) > m_defect) {
 			return calcul(ops);
 		} else {
-			return trueResult.nextInt(MAX_ERROR);
+			return trueResult.nextInt(Integer.MAX_VALUE%MAX_ERROR);
 		}
 	}
 	

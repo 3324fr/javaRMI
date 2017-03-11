@@ -19,6 +19,7 @@ abstract public class AbstractServer implements ServerInterface {
 	protected static Properties prop = new Properties();
 	protected static InputStream input = null;
 	protected static final int MAX_PERCENT = 100;
+	protected static final int RMI_REGISTRY_PORT = 5002;
 	
 	@Override
 	public int execute(int a, int b) throws RemoteException {
@@ -32,7 +33,6 @@ abstract public class AbstractServer implements ServerInterface {
 	}
 	
 	private void parseArgs(String [] args) {
-		
 	}
 
 
@@ -44,7 +44,8 @@ abstract public class AbstractServer implements ServerInterface {
 			ServerInterface stub = (ServerInterface) UnicastRemoteObject
 					.exportObject(this, 0);
 
-			Registry registry = LocateRegistry.getRegistry();
+			Registry registry = LocateRegistry.getRegistry(RMI_REGISTRY_PORT);
+			
 			registry.rebind("server", stub);
 			System.out.println("Server ready.");
 		} catch (ConnectException e) {
