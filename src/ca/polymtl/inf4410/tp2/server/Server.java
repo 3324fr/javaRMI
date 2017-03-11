@@ -5,7 +5,11 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.List;
 
+import ca.polymtl.inf4410.tp2.shared.ItemOperation;
+import ca.polymtl.inf4410.tp2.shared.Pell;
+import ca.polymtl.inf4410.tp2.shared.Prime;
 import ca.polymtl.inf4410.tp2.shared.ServerInterface;
 
 public class Server extends AbstractServer {
@@ -47,5 +51,22 @@ public class Server extends AbstractServer {
 	@Override
 	public int execute(int a, int b) throws RemoteException {
 		return a + b;
+	}
+
+	@Override
+	public int receiveOperation(List<ItemOperation> obj) throws Exception {
+		// TODO Auto-generated method stub
+		int result = 0;
+		for(ItemOperation op : obj) {
+			int value = op.value;
+			if(op instanceof Pell) {
+				result+= Operations.pell(value);
+			} else if (op instanceof Prime){
+				result += Operations.prime(value);
+			} else {
+				throw new Exception("Invalid operation");
+			}
+		}
+		return result;
 	}
 }

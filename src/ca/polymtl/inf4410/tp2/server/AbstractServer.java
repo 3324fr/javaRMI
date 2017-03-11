@@ -8,7 +8,7 @@ import java.rmi.server.UnicastRemoteObject;
 
 import ca.polymtl.inf4410.tp2.shared.ServerInterface;
 
-public class AbstractServer implements ServerInterface {
+abstract public class AbstractServer implements ServerInterface {
 
 	@Override
 	public int execute(int a, int b) throws RemoteException {
