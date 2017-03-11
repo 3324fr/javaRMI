@@ -1,5 +1,5 @@
-package ca.polymtl.inf4410.tp2.server;
+package ca.polymtl.inf4410.tp2.shared;
 
 
-public class  Prime implements ItemOperation{
+public class  Prime extends ItemOperation{
 }
