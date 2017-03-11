@@ -1,5 +1,6 @@
 package ca.polymtl.inf4410.tp2.server;
 
+import java.io.FileInputStream;
 import java.rmi.ConnectException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -14,33 +15,21 @@ import ca.polymtl.inf4410.tp2.shared.ServerInterface;
 
 public class Server extends AbstractServer {
 
+	private static Integer m_ressource;
+	
 	public static void main(String[] args) {
+		parseArgs(args);
+		checkArgs();
 		Server server = new Server();
 		server.run();
+	
 	}
-
-	public Server() {
-		super();
-	}
-
-	private void run() {
-		if (System.getSecurityManager() == null) {
-			System.setSecurityManager(new SecurityManager());
-		}
-		try {
-			ServerInterface stub = (ServerInterface) UnicastRemoteObject
-					.exportObject(this, 0);
-
-			Registry registry = LocateRegistry.getRegistry();
-			registry.rebind("server", stub);
-			System.out.println("Server ready.");
-		} catch (ConnectException e) {
-			System.err
-					.println("Impossible de se connecter au registre RMI. Est-ce que rmiregistry est lancé ?");
-			System.err.println();
-			System.err.println("Erreur: " + e.getMessage());
-		} catch (Exception e) {
-			System.err.println("Erreur: " + e.getMessage());
+	
+	private static void checkArgs() {
+		// TODO Auto-generated method stub
+		if(m_ressource == null) {
+			System.err.print("Missing args");
+			System.exit(-1);
 		}
 	}
 
@@ -54,19 +43,22 @@ public class Server extends AbstractServer {
 	}
 
 	@Override
-	public int receiveOperation(List<ItemOperation> obj) throws Exception {
+	public int receiveOperation(List<ItemOperation> ops) throws Exception {
 		// TODO Auto-generated method stub
-		int result = 0;
-		for(ItemOperation op : obj) {
-			int value = op.value;
-			if(op instanceof Pell) {
-				result+= Operations.pell(value);
-			} else if (op instanceof Prime){
-				result += Operations.prime(value);
-			} else {
-				throw new Exception("Invalid operation");
+		return calcul(ops);
+	}
+	
+	/**
+	 * parse args
+	 */
+	private static void parseArgs(String[] args){
+		String arg = null;
+		for(int i = 0; i < args.length; i++){
+			arg = args[i];
+			//RESSOURCE
+			if(arg.startsWith("-r")){
+				m_ressource = Integer.valueOf(args[++i]);
 			}
 		}
-		return result;
 	}
 }
