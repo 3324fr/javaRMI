@@ -1,4 +1,4 @@
-package ca.polymtl.inf4410.tp1.server;
+package ca.polymtl.inf4410.tp2.server;
 
 import java.rmi.ConnectException;
 import java.rmi.RemoteException;
@@ -6,9 +6,9 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 
-import ca.polymtl.inf4410.tp1.shared.ServerInterface;
+import ca.polymtl.inf4410.tp2.shared.ServerInterface;
 
-public class Server implements ServerInterface {
+public class Server extends AbstractServer {
 
 	public static void main(String[] args) {
 		Server server = new Server();
@@ -23,7 +23,6 @@ public class Server implements ServerInterface {
 		if (System.getSecurityManager() == null) {
 			System.setSecurityManager(new SecurityManager());
 		}
-
 		try {
 			ServerInterface stub = (ServerInterface) UnicastRemoteObject
 					.exportObject(this, 0);

@@ -1,4 +1,4 @@
-package ca.polymtl.inf4410.tp1.client;
+package ca.polymtl.inf4410.tp2.client;
 
 import java.rmi.AccessException;
 import java.rmi.NotBoundException;
@@ -6,7 +6,7 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 
-import ca.polymtl.inf4410.tp1.shared.ServerInterface;
+import ca.polymtl.inf4410.tp2.shared.ServerInterface;
 
 public class Client {
 	public static void main(String[] args) {
