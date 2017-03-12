@@ -42,10 +42,5 @@ public class MaliciousClient extends AbstractClient{
 		return 0;
 	}
 
-	@Override
-	protected void stopRunnable(int i) {
-		// TODO Auto-generated method stub
-	}
-
 
 }

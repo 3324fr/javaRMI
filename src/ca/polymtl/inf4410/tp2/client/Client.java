@@ -20,42 +20,36 @@ public class Client extends AbstractClient{
 
 		return 0;
 	}
-		
-
-	@Override
-	protected void stopRunnable(int hostNumber) {
-		// TODO Auto-generated method stub
-	}
-	
-	private void work(List<TaskRunnable> tasks, HashMap<String,ServerInterface> servers){
-/*		
-		ArrayList<Thread> threads = new ArrayList<>();
-		Iterator<Entry<String, ServerInterface>> it = servers.entrySet().iterator();
-		for(TaskRunnable task : tasks){
-			if(it.hasNext()){
-				Map.Entry<String,ServerInterface> entry = it.next();
-			}
 			
-				
-			task.hostname = i;
-			Thread thread = new Thread(task);
-			thread.start();
-			threads.add(thread);
-		}
-
-		for(int i = 0 ;i <threads.size();i++){ 
-			try {
-				threads.get(i).join();				
-				if( Tasks.get(i).isValidReturnValue()){
-					result =+  Tasks.get(i).getReturnValue();
-				}
-				else{
-					
-				}
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}*/
+	private void work(List<TaskRunnable> tasks, HashMap<String,ServerInterface> servers){
+		
+//		ArrayList<Thread> threads = new ArrayList<>();
+//		Iterator<Entry<String, ServerInterface>> it = servers.entrySet().iterator();
+//		for(TaskRunnable task : tasks){
+//			if(it.hasNext()){
+//				Map.Entry<String,ServerInterface> entry = it.next();
+//			}
+//			
+//				
+//			task.hostname = i;
+//			Thread thread = new Thread(task);
+//			thread.start();
+//			threads.add(thread);
+//		}
+//
+//		for(int i = 0 ;i <threads.size();i++){ 
+//			try {
+//				threads.get(i).join();				
+//				if( Tasks.get(i)){
+//					result =+  Tasks.get(i).getReturnValue();
+//				}
+//				else{
+//					
+//				}
+//			} catch (InterruptedException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
 	}
 
 
