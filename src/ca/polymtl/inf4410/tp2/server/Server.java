@@ -48,6 +48,7 @@ public class Server extends AbstractServer {
 	 */
 	@Override
 	public int execute(int a, int b) throws RemoteException {
+                System.out.println("EXECUTEEEEEEEEE" + a+b);
 		return a + b;
 	}
 

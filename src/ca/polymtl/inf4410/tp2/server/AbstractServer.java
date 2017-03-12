@@ -65,9 +65,14 @@ abstract public class AbstractServer implements ServerInterface {
 	
 	public int calcul(ArrayList<ItemOperation> obj) {
 		int result = 0;
+		System.out.println("============================");
 		for(ItemOperation op : obj) {
+                                System.out.println("op: " + op.value);
 				result += op.operation();
+				
+				//System.out.println("result: " + result);
 		}
+		System.out.println("============================");
 		return result;
 	}
 }

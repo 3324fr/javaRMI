@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Arrays;
 import java.util.Map.Entry;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -60,9 +61,10 @@ abstract public class AbstractClient {
 			ServerStub serverStub = getDistantServerStub();
 			int chunk = serverStub.qi;
 			int j = (i + chunk-1)%size;
-			TaskRunnable task = new TaskRunnable(new ArrayList<ItemOperation>(listOperation.subList(i,j)),serverStub);
+			ArrayList<ItemOperation> test = new ArrayList<ItemOperation>(listOperation.subList(i,j));
+			TaskRunnable task = new TaskRunnable(test,serverStub);
 			Tasks.add(task);
-			i = j+1;
+			i = j+1;                    
 		}
 		
 
@@ -111,6 +113,7 @@ abstract public class AbstractClient {
 		public String hostname;
 		public ServerInterface stub;
 		private ScheduledExecutorService scheduler;
+		//private ScheduledTask st = new ScheduledTask();
 		private ArrayList<ItemOperation> listOperation;
 		private int returnValue = 0;
 		private Thread t;
@@ -123,7 +126,7 @@ abstract public class AbstractClient {
 
 		TaskRunnable(ArrayList<ItemOperation> listOps, ServerStub serverStub) {
 			this.listOperation = listOps;
-			this.scheduler = Executors.newScheduledThreadPool(1);
+			this.scheduler = Executors.newScheduledThreadPool(2);
 			this.serverStub = serverStub;
 		}
 
@@ -171,6 +174,15 @@ abstract public class AbstractClient {
 
 		public void run() {
 		
+                        scheduler.scheduleAtFixedRate(new  Runnable() {
+                                        @Override
+                                        public void run() {
+                                                if(!checkServerBreakdown(serverStub.getHostname())){
+                                                        System.out.println("There is a breakdown. Restarting op");
+                                                        start2(listOperation);
+                                                }				
+                                        }
+                                },1000, 1000,TimeUnit.MILLISECONDS);
 			if( this.serverStub != null){
 			try {
                                 System.out.println("In serverStub "+serverStub.hostname+". Execute fired-----");
@@ -178,6 +190,7 @@ abstract public class AbstractClient {
                                 //System.out.println("In serverStub "+serverStub.hostname+". Run fired-----" + returnValue);
 				
 				//returnValue =  this.serverStub.getStub().receiveOperation(listOperation);
+				//System.out.println(Arrays.toString(listOperation.toArray()));
 				returnValue =  this.serverStub.getStub().receiveOperation(listOperation.toArray(new ItemOperation[listOperation.size()]));
 				System.out.println("In serverStub "+serverStub.hostname+". Run result -----" + returnValue);
 				scheduler.shutdown();
@@ -190,25 +203,19 @@ abstract public class AbstractClient {
                     
 			}
 			if(!isValidResult){
-                            //start2(listOperation);
+                            start2(listOperation);
 			}
+			
 				
 		}
 		public void start(){
-
+			
 			if (t == null) {
 				t = new Thread (this);
 				System.out.println("In Thread t start fired-----");
 				t.start ();
 			}
-			scheduler.schedule(new  Runnable() {
-				@Override
-				public void run() {
-					/*if(!checkServerBreakdown(serverStub.getHostname())){
-						//start2(listOperation);
-					}	*/			
-				}
-			},5,TimeUnit.SECONDS);
+
 		}
 	}
 
@@ -243,7 +250,7 @@ abstract public class AbstractClient {
 
 	private Boolean checkServerBreakdown(String hostName){
 		try {
-			return distantServerStubs.get(hostName).getStub().execute(4, 3) ==7;
+			return distantServerStubs.get(hostName).getStub().execute(4, 3) == 7;
 		} catch (RemoteException e) {
 			System.out.println("Le serveur " + hostName + " ne repond pas : "  + e.getMessage());
 		}
@@ -271,21 +278,24 @@ abstract public class AbstractClient {
 	public static ArrayList<ItemOperation> readOperationFile(String filename) throws IOException {
 		ArrayList<ItemOperation> list = new ArrayList<>();
 		
-		System.out.println("pwd : " + System.getProperty("user.dir"));
+		//System.out.println("pwd : " + System.getProperty("user.dir"));
 		BufferedReader br = new BufferedReader(new FileReader(filename));
 		try {
 
 			String line = br.readLine();
-			String[] parts = line.split(" ");
 			while (line != null) {   
+                                String[] parts = line.split(" ");
 				switch (parts[0]) {
 				case "prime":  list.add(new Prime(parts[1]));
 				break;
 				case "pell":  list.add(new Pell(parts[1]));
 				break;
 				default:
+				break;
 				}
 				line = br.readLine();
+				
+				//System.out.println(list.get(list.size()-1).value);
 			}
 		} 
 		finally {
