@@ -34,7 +34,7 @@ abstract public class AbstractClient {
 
 	private Iterator<Entry<String, ServerStub>> iterator;
 	
-	public AbstractClient(List<ItemOperation> listOperation, List<String> hosts ) {
+	public AbstractClient(ArrayList<ItemOperation> listOperation, ArrayList<String> hosts ) {
 		super();
 
 		if (System.getSecurityManager() == null) {
@@ -45,6 +45,10 @@ abstract public class AbstractClient {
 		for(String host : hosts){
 			String[] parts = host.split(" ");
 			ServerInterface stub = loadServerStub(parts[0]);
+			if(stub == null){
+                            System.err.print("Stub is null. EXITING");
+                            System.exit(-1);
+			}
 			int qi = Integer.valueOf(parts[1]);
 			distantServerStubs.put(host,new ServerStub(stub,parts[0],qi));
 		}
@@ -56,10 +60,11 @@ abstract public class AbstractClient {
 			ServerStub serverStub = getDistantServerStub();
 			int chunk = serverStub.qi;
 			int j = (i + chunk-1)%size;
-			TaskRunnable task = new TaskRunnable(listOperation.subList(i,j),serverStub);
+			TaskRunnable task = new TaskRunnable(new ArrayList<ItemOperation>(listOperation.subList(i,j)),serverStub);
 			Tasks.add(task);
 			i = j+1;
 		}
+		
 
 	}
 
@@ -106,7 +111,7 @@ abstract public class AbstractClient {
 		public String hostname;
 		public ServerInterface stub;
 		private ScheduledExecutorService scheduler;
-		private List<ItemOperation> listOperation;
+		private ArrayList<ItemOperation> listOperation;
 		private int returnValue = 0;
 		private Thread t;
 		private ServerStub serverStub;
@@ -116,7 +121,7 @@ abstract public class AbstractClient {
 			return isValidResult;
 		}
 
-		TaskRunnable(List<ItemOperation> listOps, ServerStub serverStub) {
+		TaskRunnable(ArrayList<ItemOperation> listOps, ServerStub serverStub) {
 			this.listOperation = listOps;
 			this.scheduler = Executors.newScheduledThreadPool(1);
 			this.serverStub = serverStub;
@@ -126,7 +131,8 @@ abstract public class AbstractClient {
 			return this.returnValue;
 		}
 
-		private void start2(List<ItemOperation> listOperation){
+		private void start2(ArrayList<ItemOperation> listOperation){
+                        System.out.println("In Start2 fired-----");
 			this.serverStub = getDistantServerStub(listOperation.size());
 			if(this.serverStub != null){
 				t.run();
@@ -137,8 +143,8 @@ abstract public class AbstractClient {
 				ServerStub serverStub1 = getDistantServerStub(halfsize);
 				ServerStub serverStub2 = getDistantServerStub(halfsize+1);
 
-				TaskRunnable task1 = new TaskRunnable(this.listOperation.subList(0, halfsize-1),serverStub1);
-				TaskRunnable task2 = new TaskRunnable(this.listOperation.subList(0, halfsize-1),serverStub2);
+				TaskRunnable task1 = new TaskRunnable(new ArrayList<ItemOperation>(listOperation.subList(0, halfsize-1)),serverStub1);
+				TaskRunnable task2 = new TaskRunnable(new ArrayList<ItemOperation>(this.listOperation.subList(halfsize, listOperationSize)),serverStub2);
 				
 				task1.start();
 				task2.start();
@@ -150,7 +156,7 @@ abstract public class AbstractClient {
 					task1.isValidResult = false;					
 				}
 				if(!task1.isValidResult)
-					start2(listOperation);
+					start2(task1.listOperation);
 				try {
 					task2.t.join();
 					this.returnValue =+ task2.getReturnValue()% 4000;
@@ -167,7 +173,9 @@ abstract public class AbstractClient {
 		
 			if( this.serverStub != null){
 			try {
+                                System.out.println("In serverStub "+serverStub.hostname+". Run fired-----");
 				returnValue =  this.serverStub.getStub().receiveOperation(listOperation);
+				System.out.println("In serverStub "+serverStub.hostname+". Run result -----" + returnValue);
 				scheduler.shutdown();
 				this.returnValue += this.getReturnValue()% 4000;
 				isValidResult = true;
@@ -175,21 +183,25 @@ abstract public class AbstractClient {
 				isValidResult = false;
 				System.out.println("Erreur: "  + e.getMessage());	
 			}
+                    
 			}
-			if(!isValidResult)
-				start2(listOperation);
+			if(!isValidResult){
+                            //start2(listOperation);
+			}
+				
 		}
 		public void start(){
 
 			if (t == null) {
 				t = new Thread (this);
+				System.out.println("In Thread t start fired-----");
 				t.start ();
 			}
 			scheduler.schedule(new  Runnable() {
 				@Override
 				public void run() {
 					if(!checkServerBreakdown(serverStub.getHostname())){
-						start2(listOperation);
+						//start2(listOperation);
 					}				
 				}
 			},5,TimeUnit.SECONDS);
@@ -237,7 +249,7 @@ abstract public class AbstractClient {
 
 	abstract protected int appelRMIDistant();
 
-	protected static List<String> readIPFile() throws IOException {
+	protected static ArrayList<String> readIPFile() throws IOException {
 		ArrayList<String> list = new ArrayList<>();
 		BufferedReader br = new BufferedReader(new FileReader(DISTANTHOSTNAMEFILE));
 		try{
@@ -252,8 +264,10 @@ abstract public class AbstractClient {
 		}
 		return list;
 	}
-	protected static List<ItemOperation> readOperationFile(String filename) throws IOException {
+	public static ArrayList<ItemOperation> readOperationFile(String filename) throws IOException {
 		ArrayList<ItemOperation> list = new ArrayList<>();
+		
+		System.out.println("pwd : " + System.getProperty("user.dir"));
 		BufferedReader br = new BufferedReader(new FileReader(filename));
 		try {
 

@@ -7,7 +7,7 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.List;
+import java.util.ArrayList;
 
 import ca.polymtl.inf4410.tp2.shared.ItemOperation;
 import ca.polymtl.inf4410.tp2.shared.Pell;
@@ -50,7 +50,7 @@ public class Server extends AbstractServer {
 	}
 
 	@Override
-	public int receiveOperation(List<ItemOperation> ops)  throws RemoteException{
+	public int receiveOperation(ArrayList<ItemOperation> ops)  throws RemoteException{
 		// TODO Auto-generated method stub
 		if(ops.size() >= m_ressource) {
 			throw new RemoteException("ops size bigger than ressources");

@@ -1,14 +1,14 @@
 package ca.polymtl.inf4410.tp2.client;
 
 import java.io.IOException;
-import java.util.List;
+import java.util.ArrayList;
 
 import ca.polymtl.inf4410.tp2.shared.ItemOperation;
 
 public class MaliciousClient extends AbstractClient{
 
 
-	public MaliciousClient(List<ItemOperation> listOperation, List<String> hostnames) {
+	public MaliciousClient(ArrayList<ItemOperation> listOperation, ArrayList<String> hostnames) {
 		super(listOperation,hostnames);
 	}
 
@@ -18,8 +18,8 @@ public class MaliciousClient extends AbstractClient{
 		if (args.length > 0) {
 			operationFile = args[0];
 		}
-		List<ItemOperation> listOperation = null;
-		List<String> hostnames = null;
+		ArrayList<ItemOperation> listOperation = null;
+		ArrayList<String> hostnames = null;
 		try {
 			listOperation = readOperationFile(operationFile);
 			hostnames = readIPFile();

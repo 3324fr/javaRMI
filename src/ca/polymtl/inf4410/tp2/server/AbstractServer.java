@@ -6,12 +6,12 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.ArrayList;
 
 import ca.polymtl.inf4410.tp2.shared.ItemOperation;
 import ca.polymtl.inf4410.tp2.shared.ServerInterface;
@@ -63,7 +63,7 @@ abstract public class AbstractServer implements ServerInterface {
 	}
 
 	
-	public int calcul(List<ItemOperation> obj) {
+	public int calcul(ArrayList<ItemOperation> obj) {
 		int result = 0;
 		for(ItemOperation op : obj) {
 				result += op.operation();

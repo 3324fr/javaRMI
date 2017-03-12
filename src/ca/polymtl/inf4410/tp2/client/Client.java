@@ -17,7 +17,7 @@ public class Client extends AbstractClient{
 	private static int result = 0;
 	private int returnValue;
 
-	public Client(List<ItemOperation> listOperation, List<String> hostnames) {
+	public Client(ArrayList<ItemOperation> listOperation, ArrayList<String> hostnames) {
 		super(listOperation, hostnames);
 	}
 	
@@ -28,10 +28,10 @@ public class Client extends AbstractClient{
 		if (args.length > 0) {
 			operationFile = args[0];
 		}
-		List<ItemOperation> listOperation = null;
-		List<String> hostnames = null;
+		ArrayList<ItemOperation> listOperation = null;
+		ArrayList<String> hostnames = null;
 		try {
-			listOperation = readOperationFile(operationFile);
+			listOperation = AbstractClient.readOperationFile(operationFile);
 			hostnames = readIPFile();
 
 		} catch (IOException e) {
@@ -46,6 +46,7 @@ public class Client extends AbstractClient{
 
 	@Override
 	protected int appelRMIDistant() {
+                System.out.println("Task size : " + Tasks.size());
 		work(Tasks);
 		return this.result;
 	}
