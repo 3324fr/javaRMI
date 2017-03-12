@@ -1,110 +1,66 @@
 package ca.polymtl.inf4410.tp2.client;
 
-import java.rmi.AccessException;
-import java.rmi.NotBoundException;
-import java.rmi.RemoteException;
-import java.rmi.registry.LocateRegistry;
-import java.rmi.registry.Registry;
+import java.util.HashMap;
+import java.util.List;
 
+import ca.polymtl.inf4410.tp2.shared.ItemOperation;
 import ca.polymtl.inf4410.tp2.shared.ServerInterface;
 
-public class Client {
-	public static void main(String[] args) {
-		String distantHostname = null;
+public class Client extends AbstractClient{
 
-		if (args.length > 0) {
-			distantHostname = args[0];
-		}
+	private int result = 0;
 
-		Client client = new Client(distantHostname);
-		client.run();
+	public Client(List<ItemOperation> listOperation, List<String> hostnames) {
+		super(listOperation, hostnames);
 	}
 
-	FakeServer localServer = null; // Pour tester la latence d'un appel de
-									// fonction normal.
-	private ServerInterface localServerStub = null;
-	private ServerInterface distantServerStub = null;
+	@Override
+	protected int appelRMIDistant() {
 
-	public Client(String distantServerHostname) {
-		super();
 
-		if (System.getSecurityManager() == null) {
-			System.setSecurityManager(new SecurityManager());
+		return 0;
+	}
+		
+
+	@Override
+	protected void stopRunnable(int hostNumber) {
+		// TODO Auto-generated method stub
+	}
+	
+	private void work(List<TaskRunnable> tasks, HashMap<String,ServerInterface> servers){
+/*		
+		ArrayList<Thread> threads = new ArrayList<>();
+		Iterator<Entry<String, ServerInterface>> it = servers.entrySet().iterator();
+		for(TaskRunnable task : tasks){
+			if(it.hasNext()){
+				Map.Entry<String,ServerInterface> entry = it.next();
+			}
+			
+				
+			task.hostname = i;
+			Thread thread = new Thread(task);
+			thread.start();
+			threads.add(thread);
 		}
 
-		localServer = new FakeServer();
-		localServerStub = loadServerStub("127.0.0.1");
-
-		if (distantServerHostname != null) {
-			distantServerStub = loadServerStub(distantServerHostname);
-		}
+		for(int i = 0 ;i <threads.size();i++){ 
+			try {
+				threads.get(i).join();				
+				if( Tasks.get(i).isValidReturnValue()){
+					result =+  Tasks.get(i).getReturnValue();
+				}
+				else{
+					
+				}
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}*/
 	}
 
-	private void run() {
-		appelNormal();
 
-		if (localServerStub != null) {
-			appelRMILocal();
-		}
+		
 
-		if (distantServerStub != null) {
-			appelRMIDistant();
-		}
-	}
 
-	private ServerInterface loadServerStub(String hostname) {
-		ServerInterface stub = null;
 
-		try {
-			Registry registry = LocateRegistry.getRegistry(hostname);
-			stub = (ServerInterface) registry.lookup("server");
-		} catch (NotBoundException e) {
-			System.out.println("Erreur: Le nom '" + e.getMessage()
-					+ "' n'est pas défini dans le registre.");
-		} catch (AccessException e) {
-			System.out.println("Erreur: " + e.getMessage());
-		} catch (RemoteException e) {
-			System.out.println("Erreur: " + e.getMessage());
-		}
-
-		return stub;
-	}
-
-	private void appelNormal() {
-		long start = System.nanoTime();
-		int result = localServer.execute(4, 7);
-		long end = System.nanoTime();
-
-		System.out.println("Temps écoulé appel normal: " + (end - start)
-				+ " ns");
-		System.out.println("Résultat appel normal: " + result);
-	}
-
-	private void appelRMILocal() {
-		try {
-			long start = System.nanoTime();
-			int result = localServerStub.execute(4, 7);
-			long end = System.nanoTime();
-
-			System.out.println("Temps écoulé appel RMI local: " + (end - start)
-					+ " ns");
-			System.out.println("Résultat appel RMI local: " + result);
-		} catch (RemoteException e) {
-			System.out.println("Erreur: " + e.getMessage());
-		}
-	}
-
-	private void appelRMIDistant() {
-		try {
-			long start = System.nanoTime();
-			int result = distantServerStub.execute(4, 7);
-			long end = System.nanoTime();
-
-			System.out.println("Temps écoulé appel RMI distant: "
-					+ (end - start) + " ns");
-			System.out.println("Résultat appel RMI distant: " + result);
-		} catch (RemoteException e) {
-			System.out.println("Erreur: " + e.getMessage());
-		}
-	}
 }

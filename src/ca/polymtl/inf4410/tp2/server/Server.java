@@ -43,7 +43,7 @@ public class Server extends AbstractServer {
 	}
 
 	@Override
-	public int receiveOperation(List<ItemOperation> ops) throws Exception {
+	public int receiveOperation(List<ItemOperation> ops)  throws RemoteException{
 		// TODO Auto-generated method stub
 		return calcul(ops);
 	}
@@ -61,4 +61,5 @@ public class Server extends AbstractServer {
 			}
 		}
 	}
+
 }

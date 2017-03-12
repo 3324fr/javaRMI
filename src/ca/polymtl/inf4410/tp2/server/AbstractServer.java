@@ -10,8 +10,6 @@ import java.util.List;
 import java.util.Properties;
 
 import ca.polymtl.inf4410.tp2.shared.ItemOperation;
-import ca.polymtl.inf4410.tp2.shared.Pell;
-import ca.polymtl.inf4410.tp2.shared.Prime;
 import ca.polymtl.inf4410.tp2.shared.ServerInterface;
 
 abstract public class AbstractServer implements ServerInterface {
@@ -59,17 +57,10 @@ abstract public class AbstractServer implements ServerInterface {
 	}
 
 	
-	public int calcul(List<ItemOperation> obj) throws Exception {
+	public int calcul(List<ItemOperation> obj) {
 		int result = 0;
 		for(ItemOperation op : obj) {
-			int value = op.value;
-			if(op instanceof Pell) {
-				result+= Operations.pell(value);
-			} else if (op instanceof Prime){
-				result += Operations.prime(value);
-			} else {
-				throw new Exception("Invalid operation");
-			}
+				result += op.operation();
 		}
 		return result;
 	}
