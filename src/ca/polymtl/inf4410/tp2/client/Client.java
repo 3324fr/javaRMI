@@ -1,60 +1,80 @@
 package ca.polymtl.inf4410.tp2.client;
 
+import java.io.IOException;
+import java.rmi.RemoteException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import ca.polymtl.inf4410.tp2.shared.ItemOperation;
 import ca.polymtl.inf4410.tp2.shared.ServerInterface;
 
 public class Client extends AbstractClient{
 
-	private int result = 0;
+	private static int result = 0;
+	private int returnValue;
 
 	public Client(List<ItemOperation> listOperation, List<String> hostnames) {
 		super(listOperation, hostnames);
 	}
+	
+
+	public static void main(String[] args) {
+
+		String operationFile = null;
+		if (args.length > 0) {
+			operationFile = args[0];
+		}
+		List<ItemOperation> listOperation = null;
+		List<String> hostnames = null;
+		try {
+			listOperation = readOperationFile(operationFile);
+			hostnames = readIPFile();
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		if (System.getSecurityManager() == null) {
+			System.setSecurityManager(new SecurityManager());
+		}
+		Client client = new Client(listOperation,hostnames);
+		client.run();
+	}
 
 	@Override
 	protected int appelRMIDistant() {
-
-
-		return 0;
+		work(Tasks);
+		return this.result;
 	}
 			
-	private void work(List<TaskRunnable> tasks, HashMap<String,ServerInterface> servers){
-		
-//		ArrayList<Thread> threads = new ArrayList<>();
-//		Iterator<Entry<String, ServerInterface>> it = servers.entrySet().iterator();
-//		for(TaskRunnable task : tasks){
-//			if(it.hasNext()){
-//				Map.Entry<String,ServerInterface> entry = it.next();
-//			}
-//			
-//				
-//			task.hostname = i;
-//			Thread thread = new Thread(task);
-//			thread.start();
-//			threads.add(thread);
-//		}
-//
-//		for(int i = 0 ;i <threads.size();i++){ 
-//			try {
-//				threads.get(i).join();				
-//				if( Tasks.get(i)){
-//					result =+  Tasks.get(i).getReturnValue();
-//				}
-//				else{
-//					
-//				}
-//			} catch (InterruptedException e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			}
+	private static void work(List<TaskRunnable> tasks){
+		ArrayList<Thread> threads = new ArrayList<>();
+		for(TaskRunnable task : tasks){
+			Thread thread = new Thread(task);
+			thread.start();
+			threads.add(thread);
+		}
+		List<TaskRunnable> listTask = new ArrayList<>();
+		for(Thread t : threads){ 
+			try {
+				t.join();
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		for(TaskRunnable t : tasks) {
+			if(!t.getIsValidResult()) {
+				listTask.add(t);
+			} else {
+				result += t.getReturnValue();
+			}
+		}
+		if(tasks.size() != 0) {
+			work(listTask);
+		}
 	}
-
-
-		
-
-
-
 }

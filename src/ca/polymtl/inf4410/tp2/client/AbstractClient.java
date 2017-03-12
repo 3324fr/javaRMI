@@ -26,6 +26,15 @@ import ca.polymtl.inf4410.tp2.shared.ServerInterface;
 
 abstract public class AbstractClient {
 
+
+	private final static String DISTANTHOSTNAMEFILE = "host.csv";
+	private final static int PORT = 5002;
+
+	protected static HashMap<String,ServerStub> distantServerStubs = null;
+	protected static ArrayList<TaskRunnable> Tasks = null;
+
+	private Iterator<Entry<String, ServerStub>> iterator;
+	
 	public AbstractClient(List<ItemOperation> listOperation, List<String> hosts ) {
 		super();
 
@@ -55,14 +64,6 @@ abstract public class AbstractClient {
 
 	}
 
-	private final static String DISTANTHOSTNAMEFILE = "host.csv";
-	private final static int PORT = 5002;
-
-	protected HashMap<String,ServerStub> distantServerStubs = null;
-	protected ArrayList<TaskRunnable> Tasks = null;
-
-	private Iterator<Entry<String, ServerStub>> iterator;
-
 	private  ServerStub getDistantServerStub(){
 		if(iterator != null && iterator.hasNext()){
 			Map.Entry<String, ServerStub> entry = iterator.next();
@@ -73,7 +74,7 @@ abstract public class AbstractClient {
 			return  getDistantServerStub();
 		}
 	}
-	private  ServerStub getDistantServerStub(int qi){
+	protected static  ServerStub getDistantServerStub(int qi){
 		for(Map.Entry<String, ServerStub> entry : distantServerStubs.entrySet()){
 			if(entry.getValue().qi <= qi)
 				return entry.getValue();
@@ -99,7 +100,6 @@ abstract public class AbstractClient {
 		public int getQi() {
 			return qi;
 		}
-
 	}
 
 
@@ -107,7 +107,7 @@ abstract public class AbstractClient {
 		public String hostname;
 		public ServerInterface stub;
 		private ScheduledExecutorService scheduler;
-		private  List<ItemOperation> listOperation;
+		private List<ItemOperation> listOperation;
 		private int returnValue = 0;
 		private Thread t;
 		private ServerStub serverStub;
@@ -175,7 +175,7 @@ abstract public class AbstractClient {
 			try {
 				returnValue =  serverStub.getStub().receiveOperation(listOperation);
 				scheduler.shutdown();
-				this.returnValue =+ this.getReturnValue()% 4000;
+				this.returnValue += this.getReturnValue()% 4000;
 				isValidResult = true;
 				return;
 			} catch (RemoteException e) {
