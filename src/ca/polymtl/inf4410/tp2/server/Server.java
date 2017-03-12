@@ -52,7 +52,7 @@ public class Server extends AbstractServer {
 	public int receiveOperation(List<ItemOperation> ops)  throws RemoteException{
 		// TODO Auto-generated method stub
 		if(ops.size() >= m_ressource) {
-			throws RemoteException("ops size bigger than ressources");
+			throw new RemoteException("ops size bigger than ressources");
 		}
 		return calcul(ops);
 	}
@@ -69,6 +69,8 @@ public class Server extends AbstractServer {
 				m_ressource = Integer.valueOf(args[++i]);
 			}
 		}
+		if(args.length <= 1){
+                    System.out.println("no args");
+		}
 	}
-
 }

@@ -229,7 +229,7 @@ abstract public class AbstractClient {
 		try {
 			return distantServerStubs.get(hostName).getStub().execute(4, 3) ==7;
 		} catch (RemoteException e) {
-			System.out.println("Le serveur " + hostName + " ne répond pas : "  + e.getMessage());
+			System.out.println("Le serveur " + hostName + " ne repond pas : "  + e.getMessage());
 		}
 		return false;
 	}
@@ -261,9 +261,9 @@ abstract public class AbstractClient {
 			String[] parts = line.split(" ");
 			while (line != null) {   
 				switch (parts[0]) {
-				case "prime":  list.add(new Prime(parts[0]));
+				case "prime":  list.add(new Prime(parts[1]));
 				break;
-				case "pell":  list.add(new Pell(parts[0]));
+				case "pell":  list.add(new Pell(parts[1]));
 				break;
 				default:
 				}
