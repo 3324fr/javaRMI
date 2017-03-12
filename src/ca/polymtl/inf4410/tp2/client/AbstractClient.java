@@ -78,7 +78,7 @@ abstract public class AbstractClient {
 	
 	
 	
-	protected class TaskRunnable implements Runnable {
+	public class TaskRunnable implements Runnable {
 		public String hostname;
 		public ServerInterface stub;
 		private ScheduledExecutorService scheduler;
