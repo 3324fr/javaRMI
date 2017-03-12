@@ -7,6 +7,8 @@ import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.Random;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Arrays;
 
 import ca.polymtl.inf4410.tp2.shared.ItemOperation;
 import ca.polymtl.inf4410.tp2.shared.ServerInterface;
@@ -33,11 +35,11 @@ public class MaliciousServer extends AbstractServer {
 	}
 
 	@Override
-	public int receiveOperation(ArrayList<ItemOperation> ops) {
+	public int receiveOperation(ItemOperation[] ops) {
 		// TODO Auto-generated method stub
 		Random trueResult = new Random();
 		if(trueResult.nextInt(MAX_PERCENT) > m_defect) {
-			return calcul(ops);
+			return calcul(new ArrayList(Arrays.asList(ops)));
 		} else {
 			return trueResult.nextInt(Integer.MAX_VALUE%MAX_ERROR);
 		}

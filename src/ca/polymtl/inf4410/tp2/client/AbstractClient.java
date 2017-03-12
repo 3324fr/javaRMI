@@ -173,11 +173,15 @@ abstract public class AbstractClient {
 		
 			if( this.serverStub != null){
 			try {
-                                System.out.println("In serverStub "+serverStub.hostname+". Run fired-----");
-				returnValue =  this.serverStub.getStub().receiveOperation(listOperation);
+                                System.out.println("In serverStub "+serverStub.hostname+". Execute fired-----");
+                                //returnValue =  this.serverStub.getStub().execute(5);
+                                //System.out.println("In serverStub "+serverStub.hostname+". Run fired-----" + returnValue);
+				
+				//returnValue =  this.serverStub.getStub().receiveOperation(listOperation);
+				returnValue =  this.serverStub.getStub().receiveOperation(listOperation.toArray(new ItemOperation[listOperation.size()]));
 				System.out.println("In serverStub "+serverStub.hostname+". Run result -----" + returnValue);
 				scheduler.shutdown();
-				this.returnValue += this.getReturnValue()% 4000;
+				this.returnValue = this.getReturnValue()% 4000;
 				isValidResult = true;
 			} catch (RemoteException e) {
 				isValidResult = false;
@@ -200,9 +204,9 @@ abstract public class AbstractClient {
 			scheduler.schedule(new  Runnable() {
 				@Override
 				public void run() {
-					if(!checkServerBreakdown(serverStub.getHostname())){
+					/*if(!checkServerBreakdown(serverStub.getHostname())){
 						//start2(listOperation);
-					}				
+					}	*/			
 				}
 			},5,TimeUnit.SECONDS);
 		}
