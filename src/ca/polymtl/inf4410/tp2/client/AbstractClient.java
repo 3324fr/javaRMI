@@ -102,16 +102,10 @@ abstract public class AbstractClient {
 
 	}
 
-<<<<<<< HEAD
+
 	protected class TaskRunnable implements Runnable {
-=======
-	
-	
-	
-	public class TaskRunnable implements Runnable {
 		public String hostname;
 		public ServerInterface stub;
->>>>>>> fca6ef9c4b253ba24dcc2d937fd2d94cc1cc52c8
 		private ScheduledExecutorService scheduler;
 		private  List<ItemOperation> listOperation;
 		private int returnValue = 0;
