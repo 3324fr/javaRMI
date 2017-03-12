@@ -33,7 +33,7 @@ public class MaliciousServer extends AbstractServer {
 	}
 
 	@Override
-	public int receiveOperation(List<ItemOperation> ops) throws Exception {
+	public int receiveOperation(List<ItemOperation> ops) {
 		// TODO Auto-generated method stub
 		Random trueResult = new Random();
 		if(trueResult.nextInt(MAX_PERCENT) > m_defect) {

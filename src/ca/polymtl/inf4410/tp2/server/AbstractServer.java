@@ -7,8 +7,13 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
+import ca.polymtl.inf4410.tp2.client.AbstractClient.TaskRunnable;
 import ca.polymtl.inf4410.tp2.shared.ItemOperation;
 import ca.polymtl.inf4410.tp2.shared.ServerInterface;
 
@@ -54,6 +59,7 @@ abstract public class AbstractServer implements ServerInterface {
 		} catch (Exception e) {
 			System.err.println("Erreur: " + e.getMessage());
 		}
+
 	}
 
 	
@@ -63,5 +69,43 @@ abstract public class AbstractServer implements ServerInterface {
 				result += op.operation();
 		}
 		return result;
+	}
+	
+
+	
+	protected class TaskRunnable implements Runnable {
+		private ScheduledExecutorService scheduler;
+
+		private  List<ItemOperation> listOperation;
+		private int returnValue;
+		private Thread t;
+
+		TaskRunnable(List<ItemOperation> listOps) {
+			this.listOperation = listOps;
+			this.scheduler = Executors.newScheduledThreadPool(1);
+		}
+
+		
+		public void start(){
+			
+			if (t == null) {
+		         t = new Thread (this);
+		         t.start ();
+		    }
+			scheduler.schedule(new  Runnable() {
+						@Override
+						public void run() {
+							
+							
+						}
+				    },2,TimeUnit.SECONDS);
+		}
+
+
+		@Override
+		public void run() {
+			// TODO Auto-generated method stub
+			
+		}
 	}
 }

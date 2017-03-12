@@ -25,6 +25,12 @@ public class Server extends AbstractServer {
 	
 	}
 	
+	public Server() {
+		if (System.getSecurityManager() == null) {
+			System.setSecurityManager(new SecurityManager());
+		}
+	}
+	
 	private static void checkArgs() {
 		// TODO Auto-generated method stub
 		if(m_ressource == null) {
@@ -45,6 +51,9 @@ public class Server extends AbstractServer {
 	@Override
 	public int receiveOperation(List<ItemOperation> ops)  throws RemoteException{
 		// TODO Auto-generated method stub
+		if(ops.size() >= m_ressource) {
+			throws RemoteException("ops size bigger than ressources");
+		}
 		return calcul(ops);
 	}
 	
