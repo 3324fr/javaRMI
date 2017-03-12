@@ -11,7 +11,6 @@ import java.rmi.registry.Registry;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -88,9 +87,9 @@ abstract public class AbstractClient {
 			this.hostname = hostname;
 			this.qi = qi;
 		}
-		private String hostname;
-		private ServerInterface stub;
-		private int qi;
+		private final String hostname;
+		private final ServerInterface stub;
+		private final int qi;
 		public String getHostname() {
 			return hostname;
 		}
@@ -127,62 +126,60 @@ abstract public class AbstractClient {
 			return this.returnValue;
 		}
 
-//		private void split(){
-//			int listOperationSize = listOperation.size();
-//			int halfsize =listOperationSize/2;
-//			if(halfsize > 3){
-//				ServerStub serverStub2 = getDistantServerStub(halfsize);
-//				this.serverStub = getDistantServerStub(halfsize+1);
-//				if(serverStub2 != null){
-//					TaskRunnable task2 = new TaskRunnable(this.listOperation.subList(0, halfsize-1),serverStub2);
-//					listOperation = listOperation.subList(halfsize, listOperation.size());
-//					Thread thread2= new Thread(task2);
-//					thread2.start();
-//				}
-//			}
-//		}
-//
-//		private void start2()
-//		{
-//			if(!isValidResult){
-//				TaskRunnable task2 = split();
-//				if(task2 != null){
-//					Thread thread2= new Thread(task2);
-//					thread2.start();
-//					this.run();
-//					try {
-//						thread2.join();
-//						this.returnValue =+ task2.getReturnValue()% 4000;
-//						task2.isValidResult = true;
-//					} catch (InterruptedException e) {
-//						task2.isValidResult = false;					
-//					}
-//					task2.start2();
-//				}
-//				this.run();
-//			}
-//		}
-		
-//		public void start2(){
-//			this.serverStub = getDistantServerStub(listOperation.size());
-//			if(serverStub2 != null){
-//				
-//			}
-//			
-//		}
+		private void start2(List<ItemOperation> listOperation){
+			this.serverStub = getDistantServerStub(listOperation.size());
+			if(this.serverStub != null){
+				t.run();
+			}
+			else{
+				int listOperationSize = listOperation.size();
+				int halfsize =listOperationSize/2;
+				ServerStub serverStub1 = getDistantServerStub(halfsize);
+				ServerStub serverStub2 = getDistantServerStub(halfsize+1);
+
+				TaskRunnable task1 = new TaskRunnable(this.listOperation.subList(0, halfsize-1),serverStub1);
+				TaskRunnable task2 = new TaskRunnable(this.listOperation.subList(0, halfsize-1),serverStub2);
+				
+				task1.start();
+				task2.start();
+				
+				try {
+					task1.t.join();
+					this.returnValue =+ task1.getReturnValue()% 4000;
+					task1.isValidResult = true;
+				} catch (InterruptedException e) {
+					task1.isValidResult = false;					
+				}
+				if(!task1.isValidResult)
+					start2(listOperation);
+				try {
+					task2.t.join();
+					this.returnValue =+ task2.getReturnValue()% 4000;
+					task2.isValidResult = true;
+				} catch (InterruptedException e) {
+					task2.isValidResult = false;					
+				}
+				if(!task2.isValidResult)
+					start2(task2.listOperation);
+			}
+			
+		}
 
 		public void run() {
+		
+			if( this.serverStub != null){
 			try {
-				returnValue =  serverStub.getStub().receiveOperation(listOperation);
+				returnValue =  this.serverStub.getStub().receiveOperation(listOperation);
 				scheduler.shutdown();
 				this.returnValue += this.getReturnValue()% 4000;
 				isValidResult = true;
-				return;
 			} catch (RemoteException e) {
 				isValidResult = false;
 				System.out.println("Erreur: "  + e.getMessage());	
 			}
-			//start2();
+			}
+			if(!isValidResult)
+				start2(listOperation);
 		}
 		public void start(){
 
@@ -194,7 +191,7 @@ abstract public class AbstractClient {
 				@Override
 				public void run() {
 					if(!checkServerBreakdown(serverStub.getHostname())){
-						//start2();
+						start2(listOperation);
 					}				
 				}
 			},5,TimeUnit.SECONDS);
