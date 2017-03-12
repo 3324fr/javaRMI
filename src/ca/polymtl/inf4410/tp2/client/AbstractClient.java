@@ -146,7 +146,6 @@ abstract public class AbstractClient {
 				try {
 					task1.t.join();
 					this.returnValue =+ task1.getReturnValue()% 4000;
-					task1.isValidResult = true;
 				} catch (InterruptedException e) {
 					task1.isValidResult = false;					
 				}
@@ -155,7 +154,6 @@ abstract public class AbstractClient {
 				try {
 					task2.t.join();
 					this.returnValue =+ task2.getReturnValue()% 4000;
-					task2.isValidResult = true;
 				} catch (InterruptedException e) {
 					task2.isValidResult = false;					
 				}
