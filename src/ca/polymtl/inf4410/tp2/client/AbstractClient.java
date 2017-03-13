@@ -152,14 +152,14 @@ abstract public class AbstractClient {
 		private void start2(ArrayList<ItemOperation> listOperation){
 			++counter;
 			if(counter > MAX_THREAD_SIZE){
-				System.out.println("Erreur: Impossible de trouver un serveur pour la t�che.");
+				System.out.println("Erreur: Impossible de trouver un serveur pour la tâche.");
 				System.exit(-2);
 
 			}
 			System.out.println("In Start2 fired-----");
 			int listOperationSize = listOperation.size();  
 			this.serverStub = getDistantServerStub();
-			if(this.serverStub.qi*5 < listOperationSize){
+			if(this.serverStub.qi*5 > listOperationSize){
 				this.run();
 			}
 			else{
@@ -271,9 +271,9 @@ abstract public class AbstractClient {
 		int result = appelRMIDistant();
 		long end = System.nanoTime();
 
-		System.out.println("Temps écoulé appel RMI distant: "
+		System.out.println("Temps Ã©coulÃ© appel RMI distant: "
 				+ (end - start) + " ns");
-		System.out.println("Résultat appel RMI distant: " + result);	
+		System.out.println("RÃ©sultat appel RMI distant: " + result);	
 
 	}
 
@@ -285,7 +285,7 @@ abstract public class AbstractClient {
 			stub = (ServerInterface) registry.lookup("server");
 		} catch (NotBoundException e) {
 			System.out.println("Erreur: Le nom '" + e.getMessage()
-			+ "' n'est pas défini dans le registre.");
+			+ "' n'est pas dÃ©fini dans le registre.");
 		} catch (AccessException e) {
 			System.out.println("Erreur: " + e.getMessage());
 		} catch (RemoteException e) {
