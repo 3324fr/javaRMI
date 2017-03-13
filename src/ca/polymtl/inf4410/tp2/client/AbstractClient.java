@@ -61,7 +61,7 @@ abstract public class AbstractClient {
 		int i = 0;
 		while(i < size){
 			ServerStub serverStub = getDistantServerStub();
-			int chunk = serverStub.qi+3;
+			int chunk = serverStub.qi*2;
 			int j = (i + chunk);
 			if(j > size)
                             j = size;

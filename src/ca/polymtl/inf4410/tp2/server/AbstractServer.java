@@ -70,8 +70,8 @@ abstract public class AbstractServer implements ServerInterface {
 	public int calcul(ArrayList<ItemOperation> obj) {
 		int result = 0;
 		for(ItemOperation op : obj) {
-                        System.out.println("In calcul op: " + op.value);
-                        result += (op.operation());
+                        result = ((result+(op.operation()%4000))%4000);              
+                        System.out.println("In calcul op: " + op.value + " result operation " + op.operation() + " final result is : " + result);
 		}
 		return (result%4000);
 	}
@@ -82,8 +82,8 @@ abstract public class AbstractServer implements ServerInterface {
             float checkin = (((size - this.m_ressource)*MAX_PERCENT)/(5*this.m_ressource)) ;
             boolean check = ((((size - this.m_ressource)*MAX_PERCENT)/(5*this.m_ressource)) > randNumber);
             System.out.println("Server rand is " + randNumber +  "  " + " and qi check is : " + checkin + "     torf" +check + " size " + size);
-            
-            return ((((size - this.m_ressource)*MAX_PERCENT)/(5*this.m_ressource)) > randNumber);
+            return false;
+            //return ((((size - this.m_ressource)*MAX_PERCENT)/(5*this.m_ressource)) > randNumber);
 	}
 	
 }
