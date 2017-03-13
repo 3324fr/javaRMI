@@ -59,5 +59,8 @@ public class MaliciousServer extends AbstractServer {
 				m_ressource = Integer.valueOf(args[++i]);
 			}
 		}
+		if(args.length <= 1){
+			System.out.println("no args");
+		}
 	}
 }

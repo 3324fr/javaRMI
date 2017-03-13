@@ -40,10 +40,12 @@ ex: ./client operations-588
 
 
 #serveur malicieux
-1) Idem que serveur, mais a letape 6, utiliser ./MaliciousServer -r qi
+1) Idem que serveur, mais a letape 6, utiliser ./MaliciousServer -r qi -d di
+qi etant le nombre de ressource (5)
+di etant le taux de defect (50 ou 80)
 
 #client mode non securise
-Meme chose que client mode securise,
+1) Meme chose que client mode securise,
 mais utilisez ./clientNonSecurise liste 
 ex:
 ./clientNonSecurise liste
