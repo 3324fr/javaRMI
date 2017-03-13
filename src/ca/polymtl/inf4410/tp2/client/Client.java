@@ -49,7 +49,7 @@ public class Client extends AbstractClient{
 	protected int appelRMIDistant() {
                 System.out.println("Task size : " + Tasks.size());
 		work(Tasks);
-		return this.result;
+		return Client.result;
 	}
 			
 	private static void work(List<TaskRunnable> tasks){
@@ -64,7 +64,6 @@ public class Client extends AbstractClient{
 			try {
 				t.join(TIMEOUT);
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -72,7 +71,7 @@ public class Client extends AbstractClient{
 			if(!t.getIsValidResult()) {
 				listTask.add(t);
 			} else {
-				result = (result+t.getReturnValue())%4000;
+				Client.result = (Client.result+t.getReturnValue())%4000;
 			}
 		}
 		if(tasks.size() != 0) {
