@@ -50,7 +50,7 @@ abstract public class AbstractClient {
 			ServerInterface stub = loadServerStub(parts[0]);
 			if(stub == null){
                             System.err.print("Stub is null. EXITING");
-                            System.exit(-1);
+                            continue;
 			}
 			int qi = Integer.valueOf(parts[1]);
 			distantServerStubs.put(host,new ServerStub(stub,parts[0],qi));
@@ -154,7 +154,7 @@ abstract public class AbstractClient {
                         }
                         //System.out.println("In Start2 fired-----");
 			int listOperationSize = listOperation.size();  
-			this.serverStub = getDistantServerStub(listOperationSize);
+			this.serverStub = getDistantServerStub();
 			if(listOperationSize < 3){
 				this.worker();
 			}
@@ -162,8 +162,8 @@ abstract public class AbstractClient {
 				
                                     int halfsize =listOperationSize/2;
                                     //System.out.println("Size " + halfsize);
-                                    ServerStub serverStub1 = getDistantServerStub(halfsize);
-                                    ServerStub serverStub2 = getDistantServerStub(halfsize+1);
+                                    ServerStub serverStub1 = getDistantServerStub();
+                                    ServerStub serverStub2 = getDistantServerStub();
                                     
                                     ArrayList<ItemOperation> list1 = new ArrayList<ItemOperation>(listOperation.subList(0, halfsize-1));
                                     
@@ -180,7 +180,7 @@ abstract public class AbstractClient {
                                     
                                     try {
                                             task1.t.join(TIMEOUT);
-                                            this.returnValue =+ task1.getReturnValue()% 4000;
+                                            this.returnValue += task1.getReturnValue()% 4000;
                                     } catch (InterruptedException e) {
                                             task1.isValidResult = false;					
                                     }
@@ -188,7 +188,7 @@ abstract public class AbstractClient {
                                             start2(task1.listOperation);
                                     try {
                                             task2.t.join(TIMEOUT);
-                                            this.returnValue =+ task2.getReturnValue()% 4000;
+                                            this.returnValue += task2.getReturnValue()% 4000;
                                     } catch (InterruptedException e) {
                                             task2.isValidResult = false;					
                                     }
@@ -227,7 +227,7 @@ abstract public class AbstractClient {
 				returnValue =  this.serverStub.getStub().receiveOperation(listOperation.toArray(new ItemOperation[listOperation.size()]));
 				System.out.println("In serverStub "+serverStub.hostname+". Run result -----" + returnValue);
 				scheduler.shutdown();
-				this.returnValue = this.getReturnValue()% 4000;
+				this.returnValue += returnValue% 4000;
 				isValidResult = true;
 			} catch (RemoteException e) {
 				isValidResult = false;
