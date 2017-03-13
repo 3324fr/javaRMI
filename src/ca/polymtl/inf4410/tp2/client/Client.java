@@ -73,7 +73,7 @@ public class Client extends AbstractClient{
 			if(!t.getIsValidResult()) {
 				listTask.add(t);
 			} else {
-				result += t.getReturnValue();
+				result = (result+t.getReturnValue())%4000;
 			}
 		}
 		if(tasks.size() != 0) {

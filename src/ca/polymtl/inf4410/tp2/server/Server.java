@@ -56,7 +56,7 @@ public class Server extends AbstractServer {
 	@Override
 	public int receiveOperation(ItemOperation[] ops)  throws RemoteException{
 		// TODO Auto-generated method stub
-		if(checkRessource(ops.length)) {
+		if(checkRessource(ops.length + 1)) {
 			throw new RemoteException("ops size bigger than ressources");
 		}
 		return calcul(new ArrayList(Arrays.asList(ops)));
