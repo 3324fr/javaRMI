@@ -1,6 +1,10 @@
 # INF4410
-Ce premier travail pratique de INF4410 a pour but de donner à l'étudiant une expérience de première
+Ce 2e travail pratique de INF4410 a pour but de donner à l'étudiant une expérience de première
 main avec les appels de procédure à distance.
+
+
+#####PARTIE 1
+
 
 #serveur 
 1) Compilez avec ant
@@ -14,10 +18,7 @@ main avec les appels de procédure à distance.
 qi etant le nombre de ressource (ex 2 ou 3 ou 5)
 7) Le message server ready  devrait afficher 
 
-#serveur malicieux
-1) Idem que serveur, mais a letape 6, utiliser ./MaliciousServer -r qi
-
-#client 
+#client mode securise
 1) Entrez les hostname et le nombre de ressource dans le fichier host.csv \
 ex:  
 L4712-10 2
@@ -33,3 +34,18 @@ ex: operations-588 au niveau du root (./operations-588)
 liste etant le nom de la liste 
 ex: ./client operations-588
 5) Lexecution se fait ici. Vous pouvez voir le temps dexecution et le resultat obtenu.
+
+
+#####PARTIE 2
+
+
+#serveur malicieux
+1) Idem que serveur, mais a letape 6, utiliser ./MaliciousServer -r qi
+
+#client mode non securise
+Meme chose que client mode securise,
+mais utilisez ./clientNonSecurise liste 
+ex:
+./clientNonSecurise liste
+liste etant le nom de la liste 
+ex: ./client operations-588
