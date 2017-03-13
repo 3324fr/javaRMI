@@ -164,10 +164,6 @@ abstract public class AbstractClient {
                                     //System.out.println("Size " + halfsize);
                                     ServerStub serverStub1 = getDistantServerStub(halfsize);
                                     ServerStub serverStub2 = getDistantServerStub(halfsize+1);
-
-                                    //TaskRunnable task1 = new TaskRunnable(new ArrayList<ItemOperation>(listOperation.subList(0, halfsize-1)),serverStub1);
-                                    //TaskRunnable task2 = new TaskRunnable(new ArrayList<ItemOperation>(this.listOperation.subList(halfsize, listOperationSize)),serverStub2);
-                                    
                                     
                                     ArrayList<ItemOperation> list1 = new ArrayList<ItemOperation>(listOperation.subList(0, halfsize-1));
                                     
