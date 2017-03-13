@@ -78,6 +78,7 @@ public class MaliciousClient extends AbstractClient{
 					t.listResults.add(taskresult);
 				}
 				if(add){
+					t.task.changeServerStub();
 					tasksReturn.add(t);
 				}	
 			}

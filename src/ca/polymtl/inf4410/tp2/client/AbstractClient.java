@@ -67,9 +67,7 @@ abstract public class AbstractClient {
 				j = size;
 			System.out.println("i : " + i);
 			System.out.println("j : " + j);
-			ArrayList<ItemOperation> test = new ArrayList<ItemOperation>(listOperation.subList(i,j));
-			printList(test);
-			TaskRunnable task = new TaskRunnable(test,serverStub);
+			TaskRunnable task = new TaskRunnable(new ArrayList<ItemOperation>(listOperation.subList(i,j)),serverStub);
 			Tasks.add(task);
 			i = j;                    
 		}
@@ -124,7 +122,6 @@ abstract public class AbstractClient {
 
 
 	protected class TaskRunnable implements Runnable {
-		public String hostname;
 		private ScheduledExecutorService scheduler;
 		private ArrayList<ItemOperation> listOperation;
 		private int returnValue = 0;
@@ -138,6 +135,10 @@ abstract public class AbstractClient {
 		
 		public Boolean getIsValidResult() {
 			return isValidResult;
+		}
+		
+		public void changeServerStub(){
+			this.serverStub = getDistantServerStub();
 		}
 
 		TaskRunnable(ArrayList<ItemOperation> listOps, ServerStub serverStub) {
@@ -159,7 +160,7 @@ abstract public class AbstractClient {
 			}
 			System.out.println("In Start2 fired-----");
 			int listOperationSize = listOperation.size();  
-			this.serverStub = getDistantServerStub();
+			changeServerStub();
 			if(this.serverStub.qi*5 > listOperationSize){
 				this.run();
 			}
