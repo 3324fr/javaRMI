@@ -228,7 +228,7 @@ abstract public class AbstractClient {
 					int reponse =  this.serverStub.getStub().receiveOperation(listOperation.toArray(new ItemOperation[listOperation.size()]));
 					System.out.println("In serverStub "+serverStub.hostname+". Run result -----" + reponse);
 					calculValue(reponse);
-
+					scheduler.shutdown();
 					isValidResult = true;
 				} catch (RemoteException e) {
 					isValidResult = false;
