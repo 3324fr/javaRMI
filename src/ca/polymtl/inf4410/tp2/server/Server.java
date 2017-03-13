@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Arrays;
 
+
 import ca.polymtl.inf4410.tp2.shared.ItemOperation;
 import ca.polymtl.inf4410.tp2.shared.Pell;
 import ca.polymtl.inf4410.tp2.shared.Prime;
@@ -18,7 +19,7 @@ import ca.polymtl.inf4410.tp2.shared.ServerInterface;
 
 public class Server extends AbstractServer {
 
-	private static Integer m_ressource;
+
 	
 	public static void main(String[] args) {
 		parseArgs(args);
@@ -29,6 +30,7 @@ public class Server extends AbstractServer {
 	}
 	
 	public Server() {
+                super();
 		if (System.getSecurityManager() == null) {
 			System.setSecurityManager(new SecurityManager());
 		}
@@ -48,19 +50,18 @@ public class Server extends AbstractServer {
 	 */
 	@Override
 	public int execute(int a, int b) throws RemoteException {
-                System.out.println("EXECUTEEEEEEEEE" + a+b);
 		return a + b;
 	}
 
 	@Override
 	public int receiveOperation(ItemOperation[] ops)  throws RemoteException{
 		// TODO Auto-generated method stub
-		if(ops.length >= m_ressource) {
+		if(checkRessource(ops.length)) {
 			throw new RemoteException("ops size bigger than ressources");
 		}
 		return calcul(new ArrayList(Arrays.asList(ops)));
 	}
-	
+
 	/**
 	 * parse args
 	 */

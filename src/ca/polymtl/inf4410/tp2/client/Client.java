@@ -42,6 +42,8 @@ public class Client extends AbstractClient{
 		}
 		Client client = new Client(listOperation,hostnames);
 		client.run();
+		System.out.println("Done");
+		System.exit(0);
 	}
 
 	@Override
@@ -61,7 +63,7 @@ public class Client extends AbstractClient{
 		List<TaskRunnable> listTask = new ArrayList<>();
 		for(Thread t : threads){ 
 			try {
-				t.join();
+				t.join(TIMEOUT);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

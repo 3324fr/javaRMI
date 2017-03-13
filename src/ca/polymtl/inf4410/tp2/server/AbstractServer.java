@@ -12,6 +12,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.ArrayList;
+import java.util.Random;
 
 import ca.polymtl.inf4410.tp2.shared.ItemOperation;
 import ca.polymtl.inf4410.tp2.shared.ServerInterface;
@@ -22,6 +23,8 @@ abstract public class AbstractServer implements ServerInterface {
 	protected static InputStream input = null;
 	protected static final int MAX_PERCENT = 100;
 	protected static final int RMI_REGISTRY_PORT = 5002;
+	protected static Random rand;
+        protected static Integer m_ressource;
 	
 	@Override
 	public int execute(int a, int b) throws RemoteException {
@@ -32,6 +35,7 @@ abstract public class AbstractServer implements ServerInterface {
 	}
 
 	public AbstractServer() {
+            rand = new Random();
 	}
 	
 	private void parseArgs(String [] args) {
@@ -65,14 +69,19 @@ abstract public class AbstractServer implements ServerInterface {
 	
 	public int calcul(ArrayList<ItemOperation> obj) {
 		int result = 0;
-		System.out.println("============================");
 		for(ItemOperation op : obj) {
-                                System.out.println("op: " + op.value);
-				result += op.operation();
-				
-				//System.out.println("result: " + result);
+                        result += op.operation();
 		}
-		System.out.println("============================");
 		return result;
 	}
+	
+		
+	protected boolean checkRessource(int size){
+            int randNumber = rand.nextInt(MAX_PERCENT); 
+            boolean check = ((((size - this.m_ressource)*MAX_PERCENT)/(5*this.m_ressource)) > randNumber);
+            System.out.println("Server rand is ." + randNumber +  "  " + check);
+            
+            return ((((size - this.m_ressource)*MAX_PERCENT)/(5*this.m_ressource)) > randNumber);
+	}
+	
 }

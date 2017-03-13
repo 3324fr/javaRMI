@@ -29,11 +29,13 @@ abstract public class AbstractClient {
 
 	private final static String DISTANTHOSTNAMEFILE = "host.csv";
 	private final static int PORT = 5002;
-
+	
+	protected static final int TIMEOUT = 9000;
 	protected static HashMap<String,ServerStub> distantServerStubs = null;
 	protected static ArrayList<TaskRunnable> Tasks = null;
 
 	private Iterator<Entry<String, ServerStub>> iterator;
+	
 	
 	public AbstractClient(ArrayList<ItemOperation> listOperation, ArrayList<String> hosts ) {
 		super();
@@ -60,7 +62,9 @@ abstract public class AbstractClient {
 		while(i < size){
 			ServerStub serverStub = getDistantServerStub();
 			int chunk = serverStub.qi;
-			int j = (i + chunk-1)%size;
+			int j = (i + chunk-1);
+			if(j > size)
+                            j = size;
 			ArrayList<ItemOperation> test = new ArrayList<ItemOperation>(listOperation.subList(i,j));
 			TaskRunnable task = new TaskRunnable(test,serverStub);
 			Tasks.add(task);
@@ -82,7 +86,8 @@ abstract public class AbstractClient {
 	}
 	protected static  ServerStub getDistantServerStub(int qi){
 		for(Map.Entry<String, ServerStub> entry : distantServerStubs.entrySet()){
-			if(entry.getValue().qi <= qi)
+                        System.out.println("entry.getValue().qi " + entry.getValue().qi + " qi " + qi);
+			if(entry.getValue().qi >= qi)
 				return entry.getValue();
 		}
 		return null;
@@ -111,7 +116,6 @@ abstract public class AbstractClient {
 
 	protected class TaskRunnable implements Runnable {
 		public String hostname;
-		public ServerInterface stub;
 		private ScheduledExecutorService scheduler;
 		//private ScheduledTask st = new ScheduledTask();
 		private ArrayList<ItemOperation> listOperation;
@@ -119,6 +123,8 @@ abstract public class AbstractClient {
 		private Thread t;
 		private ServerStub serverStub;
 		private Boolean isValidResult = false;
+		private int counter = 0;
+		private int MAX_THREAD_SIZE = 4;
 
 		public Boolean getIsValidResult() {
 			return isValidResult;
@@ -135,54 +141,85 @@ abstract public class AbstractClient {
 		}
 
 		private void start2(ArrayList<ItemOperation> listOperation){
-                        System.out.println("In Start2 fired-----");
-			this.serverStub = getDistantServerStub(listOperation.size());
-			if(this.serverStub != null){
-				t.run();
+                        ++counter;
+                        if(counter > MAX_THREAD_SIZE){
+                            //System.out.println("");
+                            try{
+                                t.sleep(10);
+                            //System.exit(-2);
+                            }
+                            catch (Exception e){
+                                e.printStackTrace();
+                            }
+                        }
+                        //System.out.println("In Start2 fired-----");
+			int listOperationSize = listOperation.size();  
+			this.serverStub = getDistantServerStub(listOperationSize);
+			if(listOperationSize < 3){
+				this.worker();
 			}
 			else{
-				int listOperationSize = listOperation.size();
-				int halfsize =listOperationSize/2;
-				ServerStub serverStub1 = getDistantServerStub(halfsize);
-				ServerStub serverStub2 = getDistantServerStub(halfsize+1);
+				
+                                    int halfsize =listOperationSize/2;
+                                    //System.out.println("Size " + halfsize);
+                                    ServerStub serverStub1 = getDistantServerStub(halfsize);
+                                    ServerStub serverStub2 = getDistantServerStub(halfsize+1);
 
-				TaskRunnable task1 = new TaskRunnable(new ArrayList<ItemOperation>(listOperation.subList(0, halfsize-1)),serverStub1);
-				TaskRunnable task2 = new TaskRunnable(new ArrayList<ItemOperation>(this.listOperation.subList(halfsize, listOperationSize)),serverStub2);
-				
-				task1.start();
-				task2.start();
-				
-				try {
-					task1.t.join();
-					this.returnValue =+ task1.getReturnValue()% 4000;
-				} catch (InterruptedException e) {
-					task1.isValidResult = false;					
-				}
-				if(!task1.isValidResult)
-					start2(task1.listOperation);
-				try {
-					task2.t.join();
-					this.returnValue =+ task2.getReturnValue()% 4000;
-				} catch (InterruptedException e) {
-					task2.isValidResult = false;					
-				}
-				if(!task2.isValidResult)
-					start2(task2.listOperation);
-			}
+                                    //TaskRunnable task1 = new TaskRunnable(new ArrayList<ItemOperation>(listOperation.subList(0, halfsize-1)),serverStub1);
+                                    //TaskRunnable task2 = new TaskRunnable(new ArrayList<ItemOperation>(this.listOperation.subList(halfsize, listOperationSize)),serverStub2);
+                                    
+                                    
+                                    ArrayList<ItemOperation> list1 = new ArrayList<ItemOperation>(listOperation.subList(0, halfsize-1));
+                                    
+                                    
+                                    ArrayList<ItemOperation> list2 = new ArrayList<ItemOperation>(listOperation.subList(halfsize, listOperationSize));
+                                    
+                                    
+                                    TaskRunnable task1 = new TaskRunnable(list1,serverStub1);
+                                    TaskRunnable task2 = new TaskRunnable(list2,serverStub2);
+                                    
+                                    
+                                    task1.start();
+                                    task2.start();
+                                    
+                                    try {
+                                            task1.t.join(TIMEOUT);
+                                            this.returnValue =+ task1.getReturnValue()% 4000;
+                                    } catch (InterruptedException e) {
+                                            task1.isValidResult = false;					
+                                    }
+                                    if(!task1.isValidResult)
+                                            start2(task1.listOperation);
+                                    try {
+                                            task2.t.join(TIMEOUT);
+                                            this.returnValue =+ task2.getReturnValue()% 4000;
+                                    } catch (InterruptedException e) {
+                                            task2.isValidResult = false;					
+                                    }
+                                    if(!task2.isValidResult)
+                                            start2(task2.listOperation);
+                                            
+                                }
 			
 		}
-
-		public void run() {
 		
-                        scheduler.scheduleAtFixedRate(new  Runnable() {
+		public void run() {           scheduler.scheduleAtFixedRate(new  Runnable() {
                                         @Override
                                         public void run() {
                                                 if(!checkServerBreakdown(serverStub.getHostname())){
                                                         System.out.println("There is a breakdown. Restarting op");
-                                                        start2(listOperation);
-                                                }				
+                                                        //start2(listOperation);
+                                                }	
+                                                System.out.println("There is a breakdown. dsadasd op");
                                         }
                                 },1000, 1000,TimeUnit.MILLISECONDS);
+                    worker();
+		}
+		
+
+		public void worker() {
+		
+             
 			if( this.serverStub != null){
 			try {
                                 System.out.println("In serverStub "+serverStub.hostname+". Execute fired-----");
@@ -227,7 +264,7 @@ abstract public class AbstractClient {
 		System.out.println("Temps écoulé appel RMI distant: "
 				+ (end - start) + " ns");
 		System.out.println("Résultat appel RMI distant: " + result);	
-
+                
 	}
 
 	private ServerInterface loadServerStub(String hostname) {
@@ -248,7 +285,7 @@ abstract public class AbstractClient {
 		return stub;
 	}
 
-	private Boolean checkServerBreakdown(String hostName){
+	private static Boolean checkServerBreakdown(String hostName){
 		try {
 			return distantServerStubs.get(hostName).getStub().execute(4, 3) == 7;
 		} catch (RemoteException e) {

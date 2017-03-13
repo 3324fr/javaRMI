@@ -26,6 +26,13 @@ public class MaliciousServer extends AbstractServer {
 		server.run();
 	}
 	
+        public MaliciousServer() {
+            super();
+            if (System.getSecurityManager() == null) {
+                    System.setSecurityManager(new SecurityManager());
+            }
+	}
+	
 	private static void checkArgs() {
 		// TODO Auto-generated method stub
 		if(m_defect == null || m_ressource == null) {
