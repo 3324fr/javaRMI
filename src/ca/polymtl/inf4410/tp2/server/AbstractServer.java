@@ -6,12 +6,8 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.Map;
-import java.util.Properties;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 import java.util.ArrayList;
+import java.util.Properties;
 import java.util.Random;
 
 import ca.polymtl.inf4410.tp2.shared.ItemOperation;
@@ -24,23 +20,18 @@ abstract public class AbstractServer implements ServerInterface {
 	protected static final int MAX_PERCENT = 100;
 	protected static final int RMI_REGISTRY_PORT = 5002;
 	protected static Random rand;
-        protected static Integer m_ressource;
-	
+	protected static Integer m_ressource;
+
 	@Override
 	public int execute(int a, int b) throws RemoteException {
-		// TODO Auto-generated method stub
-		return 0;
+		return a+b;
 	}
 	public static void main(String[] args) {
 	}
 
 	public AbstractServer() {
-            rand = new Random();
+		rand = new Random();
 	}
-	
-	private void parseArgs(String [] args) {
-	}
-
 
 	protected void run() {
 		if (System.getSecurityManager() == null) {
@@ -50,14 +41,14 @@ abstract public class AbstractServer implements ServerInterface {
 		try {
 			ServerInterface stub = (ServerInterface) UnicastRemoteObject
 					.exportObject(this, 0);
-                        System.out.println("Stub found");
+			System.out.println("Stub found");
 			Registry registry = LocateRegistry.getRegistry(RMI_REGISTRY_PORT);
 			System.out.println("registry found");
 			registry.rebind("server", stub);
 			System.out.println("Server ready.");
 		} catch (ConnectException e) {
 			System.err
-					.println("Impossible de se connecter au registre RMI. Est-ce que rmiregistry est lancé ?");
+			.println("Impossible de se connecter au registre RMI. Est-ce que rmiregistry est lancé ?");
 			System.err.println();
 			System.err.println("Erreur: " + e.getMessage());
 		} catch (Exception e) {
@@ -66,24 +57,21 @@ abstract public class AbstractServer implements ServerInterface {
 
 	}
 
-	
 	public int calcul(ArrayList<ItemOperation> obj) {
 		int result = 0;
 		for(ItemOperation op : obj) {
-                        result = ((result+(op.operation()%4000))%4000);              
-                        System.out.println("In calcul op: " + op.value + " result operation " + op.operation() + " final result is : " + result);
+			result = ((result+(op.operation()%4000))%4000);              
+			System.out.println("In calcul op: " + op.value + " result operation " + op.operation() + " final result is : " + result);
 		}
 		return (result%4000);
 	}
-	
-		
+
 	protected boolean checkRessource(int size){
-            int randNumber = rand.nextInt(MAX_PERCENT); 
-            float checkin = (((size - this.m_ressource)*MAX_PERCENT)/(5*this.m_ressource)) ;
-            boolean check = ((((size - this.m_ressource)*MAX_PERCENT)/(5*this.m_ressource)) > randNumber);
-            System.out.println("Server rand is " + randNumber +  "  " + " and qi check is : " + checkin + "     torf" +check + " size " + size);
-            return false;
-            //return ((((size - this.m_ressource)*MAX_PERCENT)/(5*this.m_ressource)) > randNumber);
+		int randNumber = rand.nextInt(MAX_PERCENT); 
+		float checkin = (((size - AbstractServer.m_ressource)*MAX_PERCENT)/(5*this.m_ressource)) ;
+		boolean check = ((((size - AbstractServer.m_ressource)*MAX_PERCENT)/(5*this.m_ressource)) > randNumber);
+		System.out.println("Server rand is " + randNumber +  "  " + " and qi check is : " + checkin + "     torf" +check + " size " + size);
+		return false;
 	}
-	
+
 }

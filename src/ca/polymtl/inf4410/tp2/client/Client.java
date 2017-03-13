@@ -15,7 +15,6 @@ import ca.polymtl.inf4410.tp2.shared.ServerInterface;
 public class Client extends AbstractClient{
 
 	private static int result = 0;
-	private int returnValue;
 
 	public Client(ArrayList<ItemOperation> listOperation, ArrayList<String> hostnames) {
 		super(listOperation, hostnames);

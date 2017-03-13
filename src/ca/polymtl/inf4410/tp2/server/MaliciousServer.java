@@ -1,40 +1,32 @@
 package ca.polymtl.inf4410.tp2.server;
 
-import java.io.FileInputStream;
-import java.rmi.ConnectException;
-import java.rmi.registry.LocateRegistry;
-import java.rmi.registry.Registry;
-import java.rmi.server.UnicastRemoteObject;
-import java.util.Random;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Arrays;
+import java.util.Random;
 
 import ca.polymtl.inf4410.tp2.shared.ItemOperation;
-import ca.polymtl.inf4410.tp2.shared.ServerInterface;
 
 public class MaliciousServer extends AbstractServer {
-	
+
 	private static Integer m_defect;
 	private static Integer m_ressource;
 	protected static final int MAX_ERROR = 4000;
-	
+
 	public static void main(String[] args) {
 		parseArgs(args);
 		checkArgs();
 		MaliciousServer server = new MaliciousServer();
 		server.run();
 	}
-	
-        public MaliciousServer() {
-            super();
-            if (System.getSecurityManager() == null) {
-                    System.setSecurityManager(new SecurityManager());
-            }
+
+	public MaliciousServer() {
+		super();
+		if (System.getSecurityManager() == null) {
+			System.setSecurityManager(new SecurityManager());
+		}
 	}
-	
+
 	private static void checkArgs() {
-		// TODO Auto-generated method stub
 		if(m_defect == null || m_ressource == null) {
 			System.err.print("Missing args");
 			System.exit(-1);
@@ -43,15 +35,14 @@ public class MaliciousServer extends AbstractServer {
 
 	@Override
 	public int receiveOperation(ItemOperation[] ops) {
-		// TODO Auto-generated method stub
 		Random trueResult = new Random();
 		if(trueResult.nextInt(MAX_PERCENT) > m_defect) {
-			return calcul(new ArrayList(Arrays.asList(ops)));
+			return calcul(new ArrayList<ItemOperation>(Arrays.asList(ops)));
 		} else {
 			return trueResult.nextInt(Integer.MAX_VALUE%MAX_ERROR);
 		}
 	}
-	
+
 	/**
 	 * parse args
 	 */

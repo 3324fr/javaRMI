@@ -2,7 +2,9 @@ package ca.polymtl.inf4410.tp2.client;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
+import ca.polymtl.inf4410.tp2.client.AbstractClient.TaskRunnable;
 import ca.polymtl.inf4410.tp2.shared.ItemOperation;
 
 public class MaliciousClient extends AbstractClient{
@@ -21,7 +23,7 @@ public class MaliciousClient extends AbstractClient{
 		ArrayList<ItemOperation> listOperation = null;
 		ArrayList<String> hostnames = null;
 		try {
-			listOperation = readOperationFile(operationFile);
+			listOperation = AbstractClient.readOperationFile(operationFile);
 			hostnames = readIPFile();
 
 		} catch (IOException e) {
@@ -30,17 +32,18 @@ public class MaliciousClient extends AbstractClient{
 		if (System.getSecurityManager() == null) {
 			System.setSecurityManager(new SecurityManager());
 		}
-
-		MaliciousClient client = new MaliciousClient(listOperation,hostnames);
+		Client client = new Client(listOperation,hostnames);
 		client.run();
+		System.out.println("Done");
+		System.exit(0);
 
 	}
 
 	@Override
 	protected int appelRMIDistant() {
-		// TODO Auto-generated method stub
 		return 0;
 	}
+			
 
 
 }

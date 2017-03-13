@@ -169,14 +169,10 @@ abstract public class AbstractClient {
 				ServerStub serverStub2 = getDistantServerStub();
 
 				ArrayList<ItemOperation> list1 = new ArrayList<ItemOperation>(listOperation.subList(0, halfsize));
-
-
 				ArrayList<ItemOperation> list2 = new ArrayList<ItemOperation>(listOperation.subList(halfsize, listOperationSize));
-
 
 				TaskRunnable task1 = new TaskRunnable(list1,serverStub1);
 				TaskRunnable task2 = new TaskRunnable(list2,serverStub2);
-
 
 				task1.start();
 				task2.start();
@@ -184,7 +180,6 @@ abstract public class AbstractClient {
 				try {
 					task1.t.join(TIMEOUT);
 					calculValue(task1.getReturnValue());
-					//this.returnValue = (this.returnValue+task1.getReturnValue())% 4000;
 				} catch (InterruptedException e) {
 					task1.isValidResult = false;					
 				}
@@ -193,15 +188,12 @@ abstract public class AbstractClient {
 				try {
 					task2.t.join(TIMEOUT);
 					calculValue(task2.getReturnValue());
-					//this.returnValue = (this.returnValue+task2.getReturnValue())% 4000;
 				} catch (InterruptedException e) {
 					task2.isValidResult = false;					
 				}
 
 				if(!task2.isValidResult)
 					start2(task2.listOperation);
-
-
 
 			}
 
@@ -214,7 +206,8 @@ abstract public class AbstractClient {
 				public void run() {
 					if(!checkServerBreakdown(serverStub.getHostname())){
 						System.out.println("There is a breakdown. Restarting op");
-						//start2(listOperation);
+						t.interrupt();
+						start2(listOperation);
 					}	
 					System.out.println("There is a breakdown. dsadasd op");
 				}
@@ -224,11 +217,6 @@ abstract public class AbstractClient {
 			if( this.serverStub != null){
 				try {
 					System.out.println("In serverStub "+serverStub.hostname+". Execute fired-----");
-					//returnValue =  this.serverStub.getStub().execute(5);
-					//System.out.println("In serverStub "+serverStub.hostname+". Run fired-----" + returnValue);
-
-					//returnValue =  this.serverStub.getStub().receiveOperation(listOperation);
-					//System.out.println(Arrays.toString(listOperation.toArray()));
 					int reponse =  this.serverStub.getStub().receiveOperation(listOperation.toArray(new ItemOperation[listOperation.size()]));
 					System.out.println("In serverStub "+serverStub.hostname+". Run result -----" + reponse);
 					calculValue(reponse);
@@ -246,8 +234,6 @@ abstract public class AbstractClient {
 				}
 
 			}
-
-
 
 		}
 		public void start(){
@@ -324,8 +310,6 @@ abstract public class AbstractClient {
 	}
 	public static ArrayList<ItemOperation> readOperationFile(String filename) throws IOException {
 		ArrayList<ItemOperation> list = new ArrayList<>();
-
-		//System.out.println("pwd : " + System.getProperty("user.dir"));
 		BufferedReader br = new BufferedReader(new FileReader(filename));
 		try {
 
@@ -341,8 +325,6 @@ abstract public class AbstractClient {
 					break;
 				}
 				line = br.readLine();
-
-				//System.out.println(list.get(list.size()-1).value);
 			}
 		} 
 		finally {
