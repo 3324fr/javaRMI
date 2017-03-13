@@ -126,7 +126,6 @@ abstract public class AbstractClient {
 	protected class TaskRunnable implements Runnable {
 		public String hostname;
 		private ScheduledExecutorService scheduler;
-		//private ScheduledTask st = new ScheduledTask();
 		private ArrayList<ItemOperation> listOperation;
 		private int returnValue = 0;
 		private Thread t;
@@ -134,7 +133,9 @@ abstract public class AbstractClient {
 		private Boolean isValidResult = false;
 		private int counter = 0;
 		private int MAX_THREAD_SIZE = 4;
-
+		private final int ALIVE_RESPONSE = 7;
+		private int serverAliveResponse = ALIVE_RESPONSE;
+		
 		public Boolean getIsValidResult() {
 			return isValidResult;
 		}
@@ -204,12 +205,19 @@ abstract public class AbstractClient {
 			scheduler.scheduleAtFixedRate(new  Runnable() {
 				@Override
 				public void run() {
-					if(!checkServerBreakdown(serverStub.getHostname())){
+					if(!(serverAliveResponse == ALIVE_RESPONSE)){
 						System.out.println("There is a breakdown. Restarting op");
 						t.interrupt();
 						start2(listOperation);
-					}	
-					System.out.println("There is a breakdown. dsadasd op");
+					}
+					serverAliveResponse = 0;
+					String hostName = serverStub.getHostname();
+					try {
+						serverAliveResponse = distantServerStubs.get(hostName).getStub().execute(4, 3);
+					} catch (RemoteException e) {
+						System.out.println("Le serveur " + hostName + " ne repond pas : "  + e.getMessage());
+					}
+					
 				}
 			},1000, 1000,TimeUnit.MILLISECONDS);
 
@@ -280,16 +288,6 @@ abstract public class AbstractClient {
 
 		return stub;
 	}
-
-	private static Boolean checkServerBreakdown(String hostName){
-		try {
-			return distantServerStubs.get(hostName).getStub().execute(4, 3) == 7;
-		} catch (RemoteException e) {
-			System.out.println("Le serveur " + hostName + " ne repond pas : "  + e.getMessage());
-		}
-		return false;
-	}
-
 
 	abstract protected int appelRMIDistant();
 
