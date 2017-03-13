@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import ca.polymtl.inf4410.tp2.client.AbstractClient.TaskRunnable;
 import ca.polymtl.inf4410.tp2.shared.ItemOperation;
 
 public class MaliciousClient extends AbstractClient{
@@ -16,7 +15,6 @@ public class MaliciousClient extends AbstractClient{
 	}
 
 	public static void main(String[] args) {
-
 		String operationFile = null;
 		if (args.length > 0) {
 			operationFile = args[0];
@@ -33,7 +31,7 @@ public class MaliciousClient extends AbstractClient{
 		if (System.getSecurityManager() == null) {
 			System.setSecurityManager(new SecurityManager());
 		}
-		Client client = new Client(listOperation,hostnames);
+		MaliciousClient client = new MaliciousClient(listOperation,hostnames);
 		client.run();
 		System.out.println("Done");
 		System.exit(0);
@@ -43,7 +41,7 @@ public class MaliciousClient extends AbstractClient{
 	@Override
 	protected int appelRMIDistant() {
 		System.out.println("Task size : " + Tasks.size());
-		List<MaliciousTask> maliciousTasks= new ArrayList<>();
+		List<MaliciousTask> maliciousTasks = new ArrayList<>();
 		for(TaskRunnable task : Tasks){
 			maliciousTasks.add(new MaliciousTask(task));
 		}
@@ -67,7 +65,8 @@ public class MaliciousClient extends AbstractClient{
 					e.printStackTrace();
 				}
 			}
-			for(MaliciousTask t : tasks) {
+			for(int i=tasks.size(); i > 0;i--) {
+				MaliciousTask t = tasks.get(i);
 				int taskresult = t.task.getReturnValue();
 				Boolean add = true;
 				if(t.task.getIsValidResult()) {
@@ -95,6 +94,4 @@ public class MaliciousClient extends AbstractClient{
 		public List<Integer> listResults;
 		public TaskRunnable task;
 	}
-
-
 }
