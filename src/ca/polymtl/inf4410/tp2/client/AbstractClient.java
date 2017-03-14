@@ -48,12 +48,11 @@ abstract public class AbstractClient {
 		for(String host : hosts){
 			String[] parts = host.split(" ");
 			ServerInterface stub = loadServerStub(parts[0]);
-			if(stub == null){
-				System.err.print("Stub is null. EXITING");
-				continue;
+			if(stub != null){
+                int qi = Integer.valueOf(parts[1]);
+                distantServerStubs.put(host,new ServerStub(stub,parts[0],qi));
 			}
-			int qi = Integer.valueOf(parts[1]);
-			distantServerStubs.put(host,new ServerStub(stub,parts[0],qi));
+			
 		}
 
 		int size = listOperation.size();
@@ -65,19 +64,9 @@ abstract public class AbstractClient {
 			int j = (i + chunk);
 			if(j > size)
 				j = size;
-			System.out.println("i : " + i);
-			System.out.println("j : " + j);
 			TaskRunnable task = new TaskRunnable(new ArrayList<ItemOperation>(listOperation.subList(i,j)),serverStub);
 			Tasks.add(task);
 			i = j;                    
-		}
-
-
-	}
-
-	private void printList(ArrayList<ItemOperation> list){
-		for(ItemOperation op : list){
-			System.out.println("In printing test : "  + op.value);
 		}
 	}
 
@@ -119,8 +108,7 @@ abstract public class AbstractClient {
 			return qi;
 		}
 	}
-
-
+	
 	protected class TaskRunnable implements Runnable {
 		private ScheduledExecutorService scheduler;
 		private ArrayList<ItemOperation> listOperation;
@@ -128,8 +116,6 @@ abstract public class AbstractClient {
 		private Thread t;
 		private ServerStub serverStub;
 		private Boolean isValidResult = false;
-		private int counter = 0;
-		private int MAX_THREAD_SIZE = 4;
 		private final int ALIVE_RESPONSE = 7;
 		private int serverAliveResponse = ALIVE_RESPONSE;
 		
@@ -137,14 +123,17 @@ abstract public class AbstractClient {
 			return isValidResult;
 		}
 		
-		public void changeServerStub(){
-			this.serverStub = getDistantServerStub();
+		TaskRunnable(TaskRunnable t) {
+			this.listOperation = t.listOperation;
+            this.scheduler = Executors.newScheduledThreadPool(1);
+            this.serverStub = getDistantServerStub();
 		}
+
 
 		TaskRunnable(ArrayList<ItemOperation> listOps, ServerStub serverStub) {
 			this.listOperation = listOps;
 			this.serverStub = serverStub;
-			this.scheduler = Executors.newScheduledThreadPool(1);
+            this.scheduler = Executors.newScheduledThreadPool(1);
 		}
 
 		public int getReturnValue(){
@@ -152,20 +141,13 @@ abstract public class AbstractClient {
 		}
 
 		private void start2(ArrayList<ItemOperation> listOperation){
-			++counter;
-			if(counter > MAX_THREAD_SIZE){
-				System.out.println("Erreur: Impossible de trouver un serveur pour la tâche.");
-				System.exit(-2);
-
-			}
-			System.out.println("In Start2 fired-----");
 			int listOperationSize = listOperation.size();  
-			changeServerStub();
+			this.serverStub = getDistantServerStub();
 			if(this.serverStub.qi*5 > listOperationSize){
 				this.run();
 			}
 			else{
-
+                isValidResult = true;
 				int halfsize =listOperationSize/2;
 				ServerStub serverStub1 = getDistantServerStub();
 				ServerStub serverStub2 = getDistantServerStub();
@@ -193,12 +175,9 @@ abstract public class AbstractClient {
 				} catch (InterruptedException e) {
 					task2.isValidResult = false;					
 				}
-
 				if(!task2.isValidResult)
 					start2(task2.listOperation);
-
 			}
-
 		}
 
 		public void run() {
@@ -206,21 +185,24 @@ abstract public class AbstractClient {
 			scheduler.scheduleAtFixedRate(new  Runnable() {
 				@Override
 				public void run() {
+                    String hostName = serverStub.getHostname();
 					if(!(serverAliveResponse == ALIVE_RESPONSE)){
 						System.out.println("There is a breakdown. Restarting op");
+						distantServerStubs.remove(hostName);
+						isValidResult = false;
+						returnValue = 0;
 						t.interrupt();
-						start2(listOperation);
 					}
 					serverAliveResponse = 0;
-					String hostName = serverStub.getHostname();
 					try {
 						serverAliveResponse = distantServerStubs.get(hostName).getStub().execute(4, 3);
 					} catch (RemoteException e) {
 						System.out.println("Le serveur " + hostName + " ne repond pas : "  + e.getMessage());
+						distantServerStubs.remove(hostName);
 					}
 					
 				}
-			},1000, 1000,TimeUnit.MILLISECONDS);
+			},0,300,TimeUnit.MILLISECONDS);
 
 
 			if( this.serverStub != null){
@@ -229,34 +211,31 @@ abstract public class AbstractClient {
 					int reponse =  this.serverStub.getStub().receiveOperation(listOperation.toArray(new ItemOperation[listOperation.size()]));
 					System.out.println("In serverStub "+serverStub.hostname+". Run result -----" + reponse);
 					calculValue(reponse);
-					scheduler.shutdown();
 					isValidResult = true;
 				} catch (RemoteException e) {
 					isValidResult = false;
-					System.out.println("Erreur: "  + e.getMessage());	
+					returnValue = 0;
+					distantServerStubs.remove( serverStub.getHostname());
+					System.out.println("Erreur: " + e.getMessage());		
+					if(t != null)
+                        t.interrupt();	
 				} finally {
-
-					if(!isValidResult){
-						isValidResult = true;
-						start2(listOperation);
-					}
+					scheduler.shutdown();
 				}
-
+				if(!isValidResult){
+						start2(listOperation);
+                }
 			}
-
 		}
 		public void start(){
-
 			if (t == null) {
 				t = new Thread (this);
 				System.out.println("In Thread t start fired-----");
 				t.start ();
 			}
-
 		}
 
 		private void calculValue(int value){
-			System.out.println("in calcul: " + value + " fdsfsdf " + this.returnValue);
 			this.returnValue = (this.returnValue+value)% 4000;
 		}
 	}
@@ -331,6 +310,4 @@ abstract public class AbstractClient {
 		}
 		return list;
 	}
-
-
 }

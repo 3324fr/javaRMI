@@ -10,12 +10,14 @@ public class MaliciousServer extends AbstractServer {
 
 	private static Integer m_defect;
 	private static Integer m_ressource;
+	private static Random trueResult;
 	protected static final int MAX_ERROR = 4000;
 
 	public static void main(String[] args) {
 		parseArgs(args);
 		checkArgs();
 		MaliciousServer server = new MaliciousServer();
+		MaliciousServer.trueResult = new Random();
 		server.run();
 	}
 
@@ -35,11 +37,10 @@ public class MaliciousServer extends AbstractServer {
 
 	@Override
 	public int receiveOperation(ItemOperation[] ops) {
-		Random trueResult = new Random();
-		if(trueResult.nextInt(MAX_PERCENT) > m_defect) {
+		if(MaliciousServer.trueResult.nextInt(MAX_PERCENT) >= m_defect) {
 			return calcul(new ArrayList<ItemOperation>(Arrays.asList(ops)));
 		} else {
-			return trueResult.nextInt(Integer.MAX_VALUE%MAX_ERROR);
+			return MaliciousServer.trueResult.nextInt(MAX_ERROR);
 		}
 	}
 

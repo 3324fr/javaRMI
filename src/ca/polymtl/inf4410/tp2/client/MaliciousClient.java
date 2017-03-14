@@ -49,7 +49,8 @@ public class MaliciousClient extends AbstractClient{
 		return MaliciousClient.result;
 	}
 
-	private static void work(List<MaliciousTask> tasks){
+	private void work(List<MaliciousTask> tasks){
+	
 		if(!tasks.isEmpty()){
 			ArrayList<Thread> threads = new ArrayList<>();
 			List<MaliciousTask> tasksReturn= new ArrayList<>();
@@ -65,9 +66,9 @@ public class MaliciousClient extends AbstractClient{
 					e.printStackTrace();
 				}
 			}
-			for(int i=tasks.size(); i > 0;i--) {
-				MaliciousTask t = tasks.get(i);
-				int taskresult = t.task.getReturnValue();
+			for(int i=tasks.size()-1; i >= 0;i--) {
+                MaliciousTask t = tasks.get(i);
+				Integer taskresult = t.task.getReturnValue();
 				Boolean add = true;
 				if(t.task.getIsValidResult()) {
 					if(t.listResults.contains(taskresult)){
@@ -75,9 +76,10 @@ public class MaliciousClient extends AbstractClient{
 						add = false;
 					}
 					t.listResults.add(taskresult);
+					
 				}
 				if(add){
-					t.task.changeServerStub();
+                    t.task = new TaskRunnable(t.task);
 					tasksReturn.add(t);
 				}	
 			}
@@ -89,7 +91,7 @@ public class MaliciousClient extends AbstractClient{
 	private class MaliciousTask{
 		public MaliciousTask(TaskRunnable t){
 			this.listResults = new ArrayList<>();
-			this.task =t;
+			this.task = t;
 		}
 		public List<Integer> listResults;
 		public TaskRunnable task;

@@ -52,7 +52,7 @@ public class Client extends AbstractClient{
 		return Client.result;
 	}
 			
-	private static void work(List<TaskRunnable> tasks){
+	private  void work(List<TaskRunnable> tasks){
 		ArrayList<Thread> threads = new ArrayList<>();
 		for(TaskRunnable task : tasks){
 			Thread thread = new Thread(task);
@@ -69,7 +69,7 @@ public class Client extends AbstractClient{
 		}
 		for(TaskRunnable t : tasks) {
 			if(!t.getIsValidResult()) {
-				listTask.add(t);
+				listTask.add(new TaskRunnable(t));
 			} else {
 				Client.result = (Client.result+t.getReturnValue())%4000;
 			}
